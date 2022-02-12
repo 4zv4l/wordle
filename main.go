@@ -94,7 +94,8 @@ func game() {
 		}
 		// check if the user has 5 guesses
 		if count == 5 {
-			fmt.Println("\033[31m", "You lost!", "\033[0m")
+			fmt.Println("\033[31m" + "You lost!" + "\033[0m")
+			fmt.Println("The word was:", word)
 			end = false
 		}
 		count++

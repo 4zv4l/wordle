@@ -12,3 +12,5 @@ Give a filename in argument to have more words
 `ex : ./wordle.exe words.txt`
 	
 **Good luck!**
+# Screenshot
+![wordle](https://user-images.githubusercontent.com/46655455/153572536-e185f8e1-b4df-45ea-b405-d3212b09feb3.png)

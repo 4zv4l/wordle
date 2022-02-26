@@ -28,9 +28,28 @@ func rules() {
 // take a random word from a list of words
 func getWord() string {
 	var (
-		words = []string{"apple", "banana", "orange", "pear", "pineapple"}
-		word  string
-		i     int
+		// list of words if no file is given
+		words = []string{
+			"apple",
+			"music",
+			"thing",
+			"child",
+			"night",
+			"world",
+			"house",
+			"water",
+			"heart",
+			"light",
+			"sound",
+			"place",
+			"right",
+			"black",
+			"white",
+			"green",
+			"happy",
+		}
+		word string
+		i    int
 	)
 	if len(os.Args) > 1 { // if a filename is given
 		// read the file

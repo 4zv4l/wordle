@@ -72,6 +72,7 @@ func getWord() string {
 		}
 	} else { // if no filename is given
 		// take a random word from the list
+		rand.Seed(time.Now().UnixNano())
 		i = rand.Intn(len(words))
 		word = words[i]
 	}

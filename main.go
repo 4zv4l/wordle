@@ -26,7 +26,7 @@ func rules() {
 }
 
 // return all the 5 length words from file
-func getFileWords(f *os.File) []string {
+func getWordsFile(f *os.File) []string {
 	var scanner = bufio.NewScanner(f)
 	var words []string
 	for scanner.Scan() {
@@ -39,13 +39,13 @@ func getFileWords(f *os.File) []string {
 }
 
 // return a random 5 letters word from file
-func randomFile(filename string) string {
+func randomWordFile(filename string) string {
 	f, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	words := getFileWords(f)
+	words := getWordsFile(f)
 	rand.Seed(time.Now().UnixNano())
 	i := rand.Intn(len(words))
 	return words[i]
@@ -63,7 +63,7 @@ func randomWord() string {
 func getWord() string {
 	var word string
 	if len(os.Args) > 1 {
-		word = randomFile(os.Args[1])
+		word = randomWordFile(os.Args[1])
 	} else {
 		word = randomWord()
 	}

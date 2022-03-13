@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 	"time"
-	"log"
 )
 
 func rules() {
@@ -43,7 +42,8 @@ func getFileWords(f *os.File) []string {
 func randomFile(filename string) string {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	words := getFileWords(f)
 	rand.Seed(time.Now().UnixNano())

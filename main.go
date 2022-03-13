@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"bufio"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+	"log"
 )
 
 func rules() {
@@ -25,97 +26,96 @@ func rules() {
 	`)
 }
 
-// take a random word from a list of words
+// return all the 5 length words from file
+func getFileWords(f *os.File) []string {
+	var scanner = bufio.NewScanner(f)
+	var words []string
+	for scanner.Scan() {
+		word := scanner.Text()
+		if len(word) == 5 {
+			words = append(words, word)
+		}
+	}
+	return words
+}
+
+// return a random 5 letters word from file
+func randomFile(filename string) string {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	words := getFileWords(f)
+	rand.Seed(time.Now().UnixNano())
+	i := rand.Intn(len(words))
+	return words[i]
+}
+
+// return a random word from the words list
+func randomWord() string {
+		// random word from list
+		rand.Seed(time.Now().UnixNano())
+		i := rand.Intn(len(words))
+		return words[i]
+}
+
+// get the word to guess during the game
 func getWord() string {
-	var (
-		// list of words if no file is given
-		words = []string{
-			"apple",
-			"music",
-			"thing",
-			"child",
-			"night",
-			"world",
-			"house",
-			"water",
-			"heart",
-			"light",
-			"sound",
-			"place",
-			"right",
-			"black",
-			"white",
-			"green",
-			"happy",
-		}
-		word string
-		i    int
-	)
-	if len(os.Args) > 1 { // if a filename is given
-		// read the file
-		words, err := ioutil.ReadFile(os.Args[1])
-		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
-		}
-		// split the file into words
-		buff := strings.Split(string(words), "\n")
-		// get a random word
-		// seed the random number generator
-		rand.Seed(time.Now().UnixNano())
-		i = rand.Intn(len(buff))
-		word = buff[i]
-		// check if the word is 5 letters long
-		if len(word) != 5 {
-			fmt.Println("Error: the file must contain 5 letters words")
-			os.Exit(1)
-		}
-	} else { // if no filename is given
-		// take a random word from the list
-		rand.Seed(time.Now().UnixNano())
-		i = rand.Intn(len(words))
-		word = words[i]
+	var word string
+	if len(os.Args) > 1 {
+		word = randomFile(os.Args[1])
+	} else {
+		word = randomWord()
 	}
 	return word
 }
 
+// compare letters between user input
+// and the guess word
+func checkLetters(secret, guess string) {
+	for i := 0; i < len(secret); i++ {
+		if secret[i] == guess[i] {
+			fmt.Print("\033[32m", string(guess[i]), "\033[0m")
+		} else if strings.ContainsAny(secret, string(guess[i])) {
+			fmt.Print("\033[34m", string(guess[i]), "\033[0m")
+		} else { // incorrect
+			fmt.Print("\033[31m", string(guess[i]), "\033[0m")
+		}
+	}
+	fmt.Println()
+}
+
+// get user input for the guess
+func getInput() string {
+	var scan = bufio.NewScanner(os.Stdin)
+	fmt.Print("> ")
+	scan.Scan()
+	if len(scan.Text()) != 5 {
+		fmt.Println("Please enter 5 letters")
+		return getInput()
+	} else if strings.ContainsAny(scan.Text(), " ") {
+		fmt.Println("No space in words please..")
+		return getInput()
+	}
+	return scan.Text()
+}
+
 func game() {
 	var (
-		word  string = getWord()
-		guess string
-		count int  = 0
+		secret  string = getWord()
+		count int  = 1
 		end   bool = true
 	)
 	for end {
-		fmt.Print("> ")
-		// read only five letters
-		fmt.Scanf("%s", &guess)
-		// flush input buffer
-		// check if the word is 5 letters long
-		if len(guess) != 5 {
-			fmt.Println("Please enter 5 letters")
-			continue
-		}
-		// check if the guess is correct showing colors per letter
-		for i := 0; i < len(word); i++ {
-			if word[i] == guess[i] { // correct at the right position
-				fmt.Print("\033[32m", string(guess[i]), "\033[0m")
-			} else if strings.ContainsAny(word, string(guess[i])) { // correct at the wrong position
-				fmt.Print("\033[34m", string(guess[i]), "\033[0m")
-			} else { // incorrect
-				fmt.Print("\033[31m", string(guess[i]), "\033[0m")
-			}
-		}
-		fmt.Println()
-		// check if the whole word is guessed
-		if word == guess {
+		guess := getInput()
+		checkLetters(secret, guess)
+		if secret == guess {
 			fmt.Println("\033[32m" + "You won!" + "\033[0m")
 			end = false
 		}
-		// check if the user has 5 guesses
 		if count == 5 {
 			fmt.Println("\033[31m" + "You lost!" + "\033[0m")
-			fmt.Println("The word was:", word)
+			fmt.Println("The word was:", secret)
 			end = false
 		}
 		count++

@@ -74,9 +74,9 @@ func getWord() string {
 // and the guess word
 func checkLetters(secret, guess string) {
 	for i := 0; i < len(secret); i++ {
-		if secret[i] == guess[i] {
+		if secret[i] == guess[i] { // right place
 			fmt.Print("\033[32m", string(guess[i]), "\033[0m")
-		} else if strings.ContainsAny(secret, string(guess[i])) {
+		} else if strings.ContainsAny(secret, string(guess[i])) { // wrong place
 			fmt.Print("\033[34m", string(guess[i]), "\033[0m")
 		} else { // incorrect
 			fmt.Print("\033[31m", string(guess[i]), "\033[0m")
@@ -113,7 +113,7 @@ func game() {
 			fmt.Println("\033[32m" + "You won!" + "\033[0m")
 			end = false
 		}
-		if count == 5 {
+		if count == 5 && end {
 			fmt.Println("\033[31m" + "You lost!" + "\033[0m")
 			fmt.Println("The word was:", secret)
 			end = false

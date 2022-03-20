@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"github.com/chzyer/readline"
 )
 
 func rules() {
@@ -85,19 +86,27 @@ func checkLetters(secret, guess string) {
 	fmt.Println()
 }
 
+// check if input contains spaces
+// or if input is more/less than 5 characters long
+func checkInput(input string) bool {
+	if len(input) != 5 {
+		fmt.Println("Please enter 5 letters")
+		return false
+	} else if strings.ContainsAny(input, " ") {
+		fmt.Println("No space in words please..")
+		return false
+	}
+	return true
+}
+
 // get user input for the guess
 func getInput() string {
-	var scan = bufio.NewScanner(os.Stdin)
-	fmt.Print("> ")
-	scan.Scan()
-	if len(scan.Text()) != 5 {
-		fmt.Println("Please enter 5 letters")
-		return getInput()
-	} else if strings.ContainsAny(scan.Text(), " ") {
-		fmt.Println("No space in words please..")
-		return getInput()
-	}
-	return scan.Text()
+	reader, err := readline.New("> ")
+	if err != nil { return getInput() }
+	input, err := reader.Readline()
+	if err != nil { return getInput() }
+	if !checkInput(string(input)) { return getInput() }
+	return string(input)
 }
 
 func game() {

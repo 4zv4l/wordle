@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+
 	"github.com/chzyer/readline"
 )
 
@@ -19,6 +20,7 @@ func rules() {
 		- Green means correct at the right position
 		- Blue means correct at the wrong position
 		- Red means incorrect
+		- type "exit" to quit
 
 	Give a filename in argument to have more words
 	
@@ -54,10 +56,10 @@ func randomWordFile(filename string) string {
 
 // return a random word from the words list
 func randomWord() string {
-		// random word from list
-		rand.Seed(time.Now().UnixNano())
-		i := rand.Intn(len(words))
-		return words[i]
+	// random word from list
+	rand.Seed(time.Now().UnixNano())
+	i := rand.Intn(len(words))
+	return words[i]
 }
 
 // get the word to guess during the game
@@ -102,18 +104,52 @@ func checkInput(input string) bool {
 // get user input for the guess
 func getInput() string {
 	reader, err := readline.New("> ")
-	if err != nil { return getInput() }
+	if err != nil {
+		return getInput()
+	}
 	input, err := reader.Readline()
-	if err != nil { return getInput() }
-	if !checkInput(string(input)) { return getInput() }
+	if err != nil {
+		return getInput()
+	}
+	// to quit type exit
+	if string(input) == "exit" {
+		os.Exit(0)
+	}
+	if !checkInput(string(input)) {
+		return getInput()
+	}
 	return string(input)
 }
 
-func game() {
+func getDifficulty() int {
+	var scan = bufio.NewScanner(os.Stdin)
+	fmt.Println("Choose a difficulty:")
+	fmt.Println("1. Easy   (15 tries)")
+	fmt.Println("2. Medium (10 tries)")
+	fmt.Println("3. Hard   (5 tries)")
+	print("Enter a number (1-3): ")
+	scan.Scan()
+	switch scan.Text() {
+	case "1":
+		fmt.Println("You chose Easy")
+		return 15
+	case "2":
+		fmt.Println("You chose Medium")
+		return 10
+	case "3":
+		fmt.Println("You chose Hard")
+		return 5
+	default:
+		fmt.Println("Please enter a number between 1 and 3")
+		return getDifficulty()
+	}
+}
+
+func game(difficulty int) {
 	var (
-		secret  string = getWord()
-		count int  = 1
-		end   bool = true
+		secret string = getWord()
+		count  int    = 1
+		end    bool   = true
 	)
 	for end {
 		guess := getInput()
@@ -134,8 +170,10 @@ func game() {
 func main() {
 	// show the rules
 	rules()
+	// get the difficulty
+	var difficulty int = getDifficulty()
 	// start the game
-	game()
+	game(difficulty)
 	// exit
 	fmt.Println("Thanks for playing!")
 }

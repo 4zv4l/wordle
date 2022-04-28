@@ -158,7 +158,7 @@ func game(difficulty int) {
 			fmt.Println("\033[32m" + "You won!" + "\033[0m")
 			end = false
 		}
-		if count == 5 && end {
+		if count == difficulty && end {
 			fmt.Println("\033[31m" + "You lost!" + "\033[0m")
 			fmt.Println("The word was:", secret)
 			end = false
